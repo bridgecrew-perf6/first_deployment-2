@@ -7,6 +7,18 @@ app = Flask(__name__)
 import sys
 
 
+@app.get('/api/animals')
+def animals_get():
+    #todo: db select
+    animal_list= run_query("SELECT * FROM animal")
+    resp = []
+    for animal in animal_list:
+        an_obj = {}
+        an_obj['animalId'] = animal[0]
+        an_obj['animalName'] = animal[1]
+        an_obj['imageURL'] = animal[2]
+        resp.append(an_obj)
+    return jsonify(animal_list), 200
 
 @app.post('/api/animals')
 def animals_post():
@@ -19,16 +31,9 @@ def animals_post():
     if not image_url:
         return jsonify("Missing required argument 'imageUrl'"), 422
     # TODO: Error checking the actual values for the arguments
-    #TODO: DB write
+    run_query("INSERT INTO animal (name, image_url) VALUES(?,?)", [animal_name, image_url])
     return jsonify("Animal added"), 201
 
-
-
-@app.get('/api/animals')
-def animals_get():
-    #todo: db select
-    animal_list=[]
-    return jsonify(animal_list), 200
 
 
 if (len(sys.argv)>1):
